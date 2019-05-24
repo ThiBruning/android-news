@@ -15,4 +15,6 @@ interface NewsService {
         @Query("apiKey")
         apiKey: String = "5954b9e550614264948df7972d254e0e"
     ): Call<NewsResponse>
+
+//    @GET()
 }
