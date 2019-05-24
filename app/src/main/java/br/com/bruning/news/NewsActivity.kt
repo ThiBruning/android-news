@@ -1,12 +1,13 @@
 package br.com.bruning.news
 
+import android.content.Intent
 import android.content.res.Resources
+import android.net.Uri
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
-import android.widget.Toast
 import br.com.bruning.news.item.ArticleItem
 import br.com.bruning.news.models.Article
 import br.com.bruning.news.models.NewsResponse
@@ -18,8 +19,9 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import androidx.core.os.ConfigurationCompat
+import br.com.bruning.news.listener.ArticleAdapterListener
 
-class NewsActivity : AppCompatActivity() {
+class NewsActivity : AppCompatActivity(), ArticleAdapterListener {
 
     private val retrofitInstance = RetrofitInstance.getRetrofitInstance("https://newsapi.org/v2/")
     private val service = retrofitInstance.create(NewsService::class.java)
@@ -27,16 +29,13 @@ class NewsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_news)
-        listArticles()
-        editSearch.addTextChangedListener(object : TextWatcher{
-            override fun afterTextChanged(s: Editable?) {
-                Toast.makeText(this@NewsActivity, s.toString(), Toast.LENGTH_LONG).show()
-                searchArticles(s.toString())
-            }
 
+        listArticles()
+
+        editSearch.addTextChangedListener(object : TextWatcher{
+            override fun afterTextChanged(s: Editable?) { searchArticles(s.toString()) }
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
             }
-
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
         })
@@ -62,7 +61,7 @@ class NewsActivity : AppCompatActivity() {
     {
         val adapter = GroupAdapter<ViewHolder>()
         articles?.forEach {articles ->
-            adapter.add(ArticleItem(articles))
+            adapter.add(ArticleItem(articles, this))
         }
         recycler_articles.adapter = adapter
     }
@@ -86,6 +85,10 @@ class NewsActivity : AppCompatActivity() {
         return locale.country
     }
 
+    override fun articleSeeMore(url: String?) {
+        val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        startActivity(browserIntent)
+    }
 }
 // 5954b9e550614264948df7972d254e0e
 
